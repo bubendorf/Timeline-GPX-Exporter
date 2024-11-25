@@ -1,5 +1,5 @@
 # Timeline-GPX-Exporter
-Convert Google timeline new JSON format to daily GPX files
+Convert Google Timeline JSON exported from an Android device to daily GPX log files
 
 I created this because I needed an easy way to find time stamps from the last year of my raw timeline data, a function that irritatingly no longer exists since timeline went device only with the now very limited Android Maps Timeline interface.
 
@@ -21,4 +21,4 @@ Example: Place both Timeline-GPX-Exporter.py and Timeline.json in C:/Timeline
          >cd C:\Timeline
          >python Timeline-GPX-Exporter.py
 
-The GPX log files produced are not perfect, some less forgiving viewers might regect them. However it does what I needed it to do perfectly, so as far as I'm concerned it's certified good enough. If this is good enough you then great, you're welcome, if it's not, well too bad, I have what I need from it and you're more than welcome to take it and adapt it to suit your needs.
+The GPX log files produced are not perfect, some less forgiving viewers might reject them. However it did what I needed it to do perfectly, so as far as I'm concerned it's certified good enough. If it's good enough for you too, then great, you're welcome. If it's not, well too bad, I have what I needed from it and you're more than welcome to take it and adapt it to suit your needs.
