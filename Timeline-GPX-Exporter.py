@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom
 from datetime import datetime
 
-startDate = '2024-01-01'
+startDate = '2000-01-01'
 endDate = '2099-12-31'
 verbose = True
 groupByMonth = True
@@ -15,9 +15,14 @@ def create_gpx_file(points, output_file):
     trk = ET.SubElement(gpx, "trk")
     trkseg = ET.SubElement(trk, "trkseg")
 
+    lastDateTime = None
     for point in points:
+        dateTime = point["time"]
+        if lastDateTime is not None and lastDateTime[0:10] != dateTime[0:10]:
+           trkseg = ET.SubElement(trk, "trkseg")
         trkpt = ET.SubElement(trkseg, "trkpt", lat=str(point["lat"]), lon=str(point["lon"]))
-        ET.SubElement(trkpt, "time").text = point["time"]
+        ET.SubElement(trkpt, "time").text = dateTime
+        lastDateTime = dateTime
 
     # Generate pretty XML
     xml_str = xml.dom.minidom.parseString(ET.tostring(gpx)).toprettyxml(indent='\t')
