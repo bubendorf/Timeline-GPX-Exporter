@@ -5,6 +5,11 @@ import xml.etree.ElementTree as ET
 import xml.dom.minidom
 from datetime import datetime
 
+startDate = '2024-01-01'
+endDate = '2099-12-31'
+verbose = True
+groupByMonth = True
+
 def create_gpx_file(points, output_file):
     gpx = ET.Element("gpx", version="1.1", creator="https://github.com/Makeshit/Timeline-GPX-Exporter", xmlns="http://www.topografix.com/GPX/1/1" )
     trk = ET.SubElement(gpx, "trk")
@@ -41,8 +46,10 @@ def parse_json(input_file):
                 # Extract date for grouping
                 date = datetime.fromisoformat(time).date().isoformat()
 
-                if date >= '2025-01-01':
-                  # Group by date
+                if date >= startDate and date <= endDate:
+                  # Group by date or by month
+                  if groupByMonth:
+                      date = date[0:7] # Strip the day
                   if date not in points_by_date:
                       points_by_date[date] = []
                   points_by_date[date].append({"lat": lat, "lon": lon, "time": time})
@@ -66,11 +73,10 @@ def main():
     points_by_date = parse_json(input_file)
 
     for date, points in points_by_date.items():
-        # Convert date format to dd-mm-yyyy ?
-        formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
-        output_file = os.path.join(output_dir, f"{formatted_date}.gpx")
+        output_file = os.path.join(output_dir, f"{date}.gpx")
         create_gpx_file(points, output_file)
-        print(f"Created: {output_file}, {len(points)} track points")
+        if verbose:
+           print(f"Created: {output_file}, {len(points)} track points")
 
 if __name__ == "__main__":
     main()
