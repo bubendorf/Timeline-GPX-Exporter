@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import json
 import xml.etree.ElementTree as ET
@@ -5,7 +6,7 @@ import xml.dom.minidom
 from datetime import datetime
 
 def create_gpx_file(points, output_file):
-    gpx = ET.Element("gpx", version="1.1", creator="https://github.com/Makeshit/Timeline-GPX-Exporter")
+    gpx = ET.Element("gpx", version="1.1", creator="https://github.com/Makeshit/Timeline-GPX-Exporter", xmlns="http://www.topografix.com/GPX/1/1" )
     trk = ET.SubElement(gpx, "trk")
     trkseg = ET.SubElement(trk, "trkseg")
 
@@ -14,9 +15,10 @@ def create_gpx_file(points, output_file):
         ET.SubElement(trkpt, "time").text = point["time"]
 
     # Generate pretty XML
-    xml_str = xml.dom.minidom.parseString(ET.tostring(gpx)).toprettyxml(indent="  ")
+    xml_str = xml.dom.minidom.parseString(ET.tostring(gpx)).toprettyxml(indent='\t')
+#    xml_str = ET.tostring(gpx, encoding="utf-8").decode("utf-8")
 
-    # Write the pretty XML to a file
+    # Write the XML to a file
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(xml_str)
 
@@ -34,15 +36,16 @@ def parse_json(input_file):
                 raw_coords = path_point["point"].replace("°", "").strip()
                 coords = raw_coords.split(", ")
                 lat, lon = float(coords[0]), float(coords[1])
-                time = path_point["time"]
+                time = path_point["time"].replace(".000", "")
 
                 # Extract date for grouping
                 date = datetime.fromisoformat(time).date().isoformat()
 
-                # Group by date
-                if date not in points_by_date:
-                    points_by_date[date] = []
-                points_by_date[date].append({"lat": lat, "lon": lon, "time": time})
+                if date >= '2025-01-01':
+                  # Group by date
+                  if date not in points_by_date:
+                      points_by_date[date] = []
+                  points_by_date[date].append({"lat": lat, "lon": lon, "time": time})
             except (KeyError, ValueError):
                 continue  # Skip invalid points
 
@@ -63,11 +66,11 @@ def main():
     points_by_date = parse_json(input_file)
 
     for date, points in points_by_date.items():
-        # Convert date format to dd-mm-yyyy
+        # Convert date format to dd-mm-yyyy ?
         formatted_date = datetime.strptime(date, "%Y-%m-%d").strftime("%Y-%m-%d")
         output_file = os.path.join(output_dir, f"{formatted_date}.gpx")
         create_gpx_file(points, output_file)
-        print(f"Created: {output_file}")
+        print(f"Created: {output_file}, {len(points)} track points")
 
 if __name__ == "__main__":
     main()
